@@ -97,11 +97,6 @@ void readAndCalculatepH() {
     adc = ads.readADC_SingleEnded(0);
     voltage = adc * 4.096 / 32767;
     pHValue = ((3.5 * voltage) + offset);
-
-
-    double adcv[n] = {1.77, 654, 666, 670, 674};
-    double phv[n] = {4.0, 10, 15, 20, 25};
-
     Serial.print("adc: ");
     Serial.println(adc, DEC);
     Serial.print("Voltage: ");
