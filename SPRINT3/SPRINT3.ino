@@ -9,23 +9,23 @@ Adafruit_ADS1115 ads;
 #define printInterval 800
 #define ArrayLength 40
 
-int pHArray[ArrayLength]; // Stores pH samples
+int pHArray[ArrayLength]; // Almacena las muestras de pH
 int pHArrayIndex = 0;
 
-// Function to set up the initial configuration
+// Función para configurar la configuración inicial
 void setup() {
   Serial.begin(9600);
   ads.begin();
   ads.setGain(GAIN_ONE);
   pinMode(power_pin, OUTPUT);
-  Serial.println("Initializing pH meter");
+  Serial.println("Inicializando el medidor de pH");
 }
 
-// Main execution loop
+// Bucle principal de ejecución
 void loop() {
   int16_t sensorValue = ads.readADC_SingleEnded(0);
 
-  // Uncomment the following lines to enable additional sensor readings
+  // Descomenta las siguientes líneas para habilitar lecturas adicionales del sensor
   // calculateAndPrintHumidity(sensorValue);
   // calculateAndPrintTemperature(sensorValue);
   readAndCalculateSalinity();
@@ -34,16 +34,16 @@ void loop() {
   delay(1000);
 }
 
-// Function to calculate and print humidity based on sensor value
+// Función para calcular e imprimir la humedad basada en el valor del sensor
 void calculateAndPrintHumidity(int16_t sensorValue) {
   int humidityValue = map(sensorValue, 30123, 17290, 0, 100);
   Serial.println();
-  Serial.print("Humidity: ");
+  Serial.print("Humedad: ");
   Serial.print(humidityValue);
   Serial.println("%");
 }
 
-// Function to calculate and print temperature based on sensor value
+// Función para calcular e imprimir la temperatura basada en el valor del sensor
 void calculateAndPrintTemperature(int16_t sensorValue) {
   float v0 = (sensorValue * 4.096) / 32767;
   float T = (v0 - 0.79) / 0.035;
@@ -51,7 +51,7 @@ void calculateAndPrintTemperature(int16_t sensorValue) {
   Serial.println(" Celsius");
 }
 
-// Lagrange interpolation function for salinity calculation
+// Función de interpolación de Lagrange para el cálculo de salinidad
 double lagrangeInterpolation(double* x, double* y, int n, double xi) {
   double result = 0.0;
 
@@ -68,7 +68,7 @@ double lagrangeInterpolation(double* x, double* y, int n, double xi) {
   return result;
 }
 
-// Function to read and calculate salinity
+// Función para leer y calcular la salinidad
 void readAndCalculateSalinity() {
   const int n = 5;
   double valorDigital[n] = {519, 654, 666, 670, 674};
@@ -85,12 +85,12 @@ void readAndCalculateSalinity() {
   
   int16_t Salinidad = lagrangeInterpolation(valorDigital, salinidad, n, adc0);
 
-  Serial.print("Salinity (g): ");
+  Serial.print("Salinidad (g): ");
   Serial.println(Salinidad); 
   Serial.println(adc0); 
 }
 
-// Function to read and calculate pH
+// Función para leer y calcular el pH
 void readAndCalculatepH() {
   static unsigned long samplingTime = millis();
   static unsigned long printTime = millis();
@@ -102,16 +102,11 @@ void readAndCalculatepH() {
     voltage = adc * 4.096 / 32767;
     pHValue = ((3.5 * voltage) + offset);
     
-    int n2 = 5;
-    double v[n2] = {6.07, 6.44, 7.0, 7.62, 7.70};
-    double phv[n2] = {4.0, 4.70, 7.0, 9.53, 9.88};
-
-    double pHResult = lagrangeInterpolation(v, phv, n2, pHValue);  
     Serial.print("adc: ");
     Serial.println(adc, DEC);
     Serial.print("Voltage: ");
     Serial.println(voltage, 2);
-    Serial.print("pH value: ");
+    Serial.print("Valor de pH: ");
     Serial.println(pHResult, 2);
 
     printTime = millis();
@@ -122,23 +117,23 @@ void readAndCalculatepH() {
   }
 
   if (millis() - printTime >= 10000) {
-    // Your code to execute if the condition is true
+    // Tu código para ejecutar si la condición es verdadera
     printTime = millis();
   }
 }
 
-// Function to check and print light level based on sensor value
+// Función para verificar e imprimir el nivel de luz según el valor del sensor
 void checkLightLevel(int16_t sensorValue) {
-  // DARK_THRESHOLD
+  // UMBRAL_OSCURO
   if (sensorValue < 1000) {
-    Serial.println("Darkness");
-  // SHADE_THRESHOLD
+    Serial.println("Oscuridad");
+  // UMBRAL_SOMBRA
   } else if (sensorValue < 2000) {
-    Serial.println("Shade");
-  // AMBIENT_LIGHT_THRESHOLD
+    Serial.println("Sombra");
+  // UMBRAL_LUZ_AMBIENTE
   } else if (sensorValue < 3000) {
-    Serial.println("Ambient light");
+    Serial.println("Luz ambiente");
   } else {
-    Serial.println("High light level");
+    Serial.println("Nivel alto de iluminación");
   }
 }
