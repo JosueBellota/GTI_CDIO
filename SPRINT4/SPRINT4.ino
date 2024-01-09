@@ -1,35 +1,64 @@
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
+#include <ESP8266WiFi.h>
 
 Adafruit_ADS1115 ads;
 
 #define power_pin 5
+
+#define PRINT_DEBUG_MESSAGES
+#define PRINT_HTTP_RESPONSE
+
+const char WiFiSSID[] = "Your_WiFi_SSID";
+const char WiFiPSK[] = "Your_WiFi_Password";
+
+const char Server_Host[] = "dweet.io";
+const int Server_HttpPort = 80;
+
+WiFiClient client;
+String MyWriteAPIKey = "cdiocurso2023g05";
+
+#define NUM_FIELDS_TO_SEND 5
+
+double humidityValue;  // Declare global variables to store sensor data
+double T;
+double Salinidad;
+float pHValue;
+
+void HTTPPost(String fieldData[], int numFields);
+void HTTPGet(String fieldData[], int numFields);
+void connectWiFi();
 
 void setup() {
   Serial.begin(9600);
   ads.begin();
   ads.setGain(GAIN_ONE);
   pinMode(power_pin, OUTPUT);
-  Serial.println("Inicializando el medidor de pH");
+  Serial.println("Initializing pH meter");
 }
 
 void loop() {
-
   int16_t sensorValue = ads.readADC_SingleEnded(0);
-  // int16_t humiditySensorValue = ads.readADC_SingleEnded(1);
-  // int16_t temperatureSensorValue = ads.readADC_SingleEnded(2);
-  // int16_t lightSensorValue = ads.readADC_SingleEnded(4);
+  int16_t humiditySensorValue = ads.readADC_SingleEnded(2);
+  int16_t temperatureSensorValue = ads.readADC_SingleEnded(1);
+  int16_t lightSensorValue = ads.readADC_SingleEnded(3);
 
-  // int16_t salinitySensorValue = ads.readADC_SingleEnded(salinity_channel);
-  // int16_t pHSensorValue = ads.readADC_SingleEnded(sensorValue);
-
-
-  // calculateAndPrintHumidity(humiditySensorValue);
-  // calculateAndPrintTemperature(temperatureSensorValue);
-  // readAndCalculateSalinity();
+  calculateAndPrintHumidity(humiditySensorValue);
+  calculateAndPrintTemperature(temperatureSensorValue);
+  readAndCalculateSalinity();
   checkLightLevel();
   readAndCalculatepH();
-  delay(1000);
+
+  // Send all sensor data to Dweet
+  String data[NUM_FIELDS_TO_SEND + 1];
+  data[1] = String(humidityValue);  // Replace with your actual humidity value
+  data[2] = String(T);  // Replace with your actual temperature value
+  data[3] = String(Salinidad);  // Replace with your actual salinity value
+  data[4] = String(pHValue);  // Replace with your actual pH value
+  data[5] = String(lightSensorValue);  // Replace with your actual light sensor value
+  HTTPGet(data, NUM_FIELDS_TO_SEND);
+
+  delay(15000);
 }
 
 void calculateAndPrintHumidity(int16_t sensorValue) {
@@ -131,7 +160,7 @@ void checkLightLevel() {
   // UMBRAL_OSCURO
 
   int16_t adclight;
-  adclight = ads.readADC_SingleEnded(1);
+  adclight = ads.readADC_SingleEnded(3);
 
   if (adclight < 64) {
     Serial.println("Oscuridad");
@@ -153,4 +182,3 @@ void checkLightLevel() {
    Serial.println(adclight);
    Serial.println(" ");
 }
-
