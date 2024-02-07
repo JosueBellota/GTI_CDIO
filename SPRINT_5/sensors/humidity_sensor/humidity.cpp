@@ -15,4 +15,7 @@ void Humidity::print() {
   Serial.print("Humedad: ");
   Serial.print(humidityValue);
   Serial.println("%");
+  if( humidityValue < 90 && humidityValue > 79 >){
+      Serial.print("Valor óptimo");
+  }
 }
