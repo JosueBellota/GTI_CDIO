@@ -13,4 +13,7 @@ void Temperature::calculate(int16_t sensorValue) {
 void Temperature::print() {
   Serial.print(temperatureValue);
   Serial.println(" Celsius");
+  if( temperatureValue < 24 && temperatureValue > 18 ){
+    Serial.print("Valor óptimo");
+  }
 }
