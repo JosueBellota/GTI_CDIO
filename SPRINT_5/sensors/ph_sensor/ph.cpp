@@ -27,6 +27,9 @@ void pH::print() {
       Serial.print(i);
       Serial.print("]: ");
       Serial.println(pHArray[i], 2);
+        if( pHArray[i] < 5.8 && pHArray[i] > 5.5 ){
+          Serial.print("Valor óptimo");
+        }
     }
     Serial.println(); 
   }
