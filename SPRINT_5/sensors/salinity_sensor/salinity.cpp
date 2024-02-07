@@ -19,6 +19,9 @@ void Salinity::print() {
   Serial.print("Salinidad (g): ");
   Serial.println(salinityValue); 
   Serial.println(adc0); 
+  if( salinityValue < 2.5 && salinityValue > 1.5 ){
+  Serial.print("Valor óptimo");
+  }
 }
 
 double Salinity::lagrangeInterpolation(double* x, double* y, int n, double xi) {
