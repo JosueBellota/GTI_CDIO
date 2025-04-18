@@ -1,9 +1,9 @@
 #include <Wire.h>
-#include <Adafruit_ADS1X15.h> // Note: Specify the full library name
+#include <Adafruit_ADS1X15.h> 
 // ----------------------------------
 // Programa de Humedad y Temperatura
 // ------------------------------------
-Adafruit_ADS1115 ads; // Constructor del objeto ADS1115
+Adafruit_ADS1115 ads;
 
 int channelValue = 0;
 int sensorValue = 0;
